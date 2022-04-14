@@ -1,42 +1,55 @@
 import './rightbar.css'
-import { Users } from '../../dummyData'
 import Online from '../../components/online/Online'
-import { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { Link } from 'react-router-dom'
-import { AuthContext } from '../../context/AuthContext'
+import { publicRequest, userRequest } from '../../requestMethods';
 import { Add, Remove } from '@mui/icons-material'
+import { useDispatch, useSelector } from 'react-redux'
 
 export default function Rightbar({ user }) {
     const PF = process.env.REACT_APP_PUBLIC_FOLDER
-    const { user: currentUser, dispatch } = useContext(AuthContext)
+    const currentUser = useSelector(state => state.user.currentUser)
+    const dispatch = useDispatch()
 
     const [friends, setFriends] = useState([])
-    const [followed, setFollowed] = useState(currentUser.followings.includes(user?._id))
+
+    //bool state to check if user is followed or not
+    const [followed, setFollowed] = useState()
 
     useEffect(() => {
         const getFriends = async () => {
             try {
-                const res = await axios.get('/user/friends/' + user?._id)
+                const res = await publicRequest.get('/user/friends/' + currentUser?.id)
                 setFriends(res.data)
             } catch (error) {
                 console.log(error);
             }
         }
         getFriends()
-    }, [user])
+    }, [currentUser, user])
     useEffect(() => {
-        setFollowed(currentUser.followings.includes(user?._id))
+        const getFollowed = async () => {
+            try {
+                const res = await publicRequest.get('/user/friends/' + user?.id, { user_id: currentUser?.id })
+                console.log(res.data)
+                setFollowed(res.data)
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        getFollowed()
     }, [currentUser, user])
 
+    //handle follow button in profile
     const handleClick = async () => {
         try {
             if (followed) {
-                await axios.put(`/user/${user._id}/unfollow`, { userId: currentUser._id })
-                dispatch({ type: "UNFOLLOW", payload: user._id })
+                await axios.put(`/user/${user.id}/unfollow`, { userId: currentUser.id })
+                dispatch({ type: "UNFOLLOW", payload: user.id })
             } else {
-                await axios.put(`/user/${user._id}/follow`, { userId: currentUser._id })
-                dispatch({ type: "FOLLOW", payload: user._id })
+                await axios.put(`/user/${user.id}/follow`, { userId: currentUser.id })
+                dispatch({ type: "FOLLOW", payload: user.id })
             }
         }
         catch (error) {
@@ -54,10 +67,10 @@ export default function Rightbar({ user }) {
                     </span>
                 </div>
 
-                <img src={`${PF}ad.png`} alt="" className="rightbarAd" />
+                <img alt="" className="rightbarAd" />
                 <h4 className="rightbarTitle">Online Friends</h4>
                 <ul className="rightbarFriendList">
-                    {Users.map(u => (
+                    {friends.map(u => (
                         <Online key={u.id} user={u} />
                     ))}
                 </ul>
@@ -91,10 +104,10 @@ export default function Rightbar({ user }) {
                 <h4 className="rightbarTitle">User friends</h4>
                 <div className="rightbarFollowings">
                     {friends.map(u => (
-                        <Link key={u._id} to={"/profile/" + u.username} style={{ textDecoration: "none" }}>
+                        <Link key={u.id} to={"/profile/" + u.username} style={{ textDecoration: "none", color: "black" }}>
                             <div className="rightbarFollowing">
                                 <img
-                                    src={u.profilePicture ? PF + u.profilePicture : PF + "person/noAvatar.png"}
+                                    src={u.profile_picture ? PF + u.profile_picture : PF + "person/noAvatar.png"}
                                     alt=""
                                     className="rightbarFollowingImg"
                                 />

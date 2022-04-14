@@ -1,11 +1,20 @@
 import "./topbar.css";
 import { Search, Person, Chat, Notifications } from '@mui/icons-material';
-import { Link } from "react-router-dom";
-import { useContext } from "react";
-import { AuthContext } from "../../context/AuthContext";
+import { Link, useNavigate } from "react-router-dom";
+// import { useContext } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../redux/apiCalls";
+// import { AuthContext } from "../../context/AuthContext";
 export default function Topbar() {
     const PF = process.env.REACT_APP_PUBLIC_FOLDER
-    const { user } = useContext(AuthContext)
+    const user = useSelector(state => state.user.currentUser)
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+
+    const handleLogout = (e) => {
+        e.preventDefault()
+        logout(dispatch).then(navigate('/login'))
+    }
 
     return (
         <div className="topbarContainer">
@@ -22,8 +31,8 @@ export default function Topbar() {
             </div>
             <div className="topbarRight">
                 <div className="topbarLinks">
-                    <span className="topbarLink">Homepage</span>
                     <span className="topbarLink">Timeline</span>
+                    <span className="topbarLink" onClick={handleLogout}>Log out</span>
                 </div>
                 <div className="topbarIcons">
                     <div className="topbarIconItem">
@@ -40,7 +49,7 @@ export default function Topbar() {
                     </div>
                 </div>
                 <Link to={`/profile/${user.username}`} style={{ textDecoration: 'none' }}>
-                    <img src={user.profilePicture ? PF + user.profilePicture : PF + "person/noAvatar.png"} alt="" className="topbarImg" />
+                    <img src={user.profile_picture ? PF + user.profile_picture : PF + "person/noAvatar.png"} alt="" className="topbarImg" />
                 </Link>
             </div>
         </div>

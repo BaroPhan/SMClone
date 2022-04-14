@@ -1,21 +1,41 @@
-const mongoose = require('mongoose')
-
-const PostSchema = new mongoose.Schema({
-    userId: {
-        type: String,
-        require: true,
+const Sequelize = require('sequelize');
+module.exports = function(sequelize, DataTypes) {
+  return sequelize.define('Post', {
+    id: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      primaryKey: true,
+      defaultValue: DataTypes.UUIDV4
+    },
+    user_id: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: 'User',
+        key: 'id'
+      }
     },
     img: {
-        type: String
-    },
-    likes: {
-        type: Array,
-        default: []
+      type: DataTypes.STRING(255),
+      allowNull: true
     },
     desc: {
-        type: String,
-        max: 500
+      type: DataTypes.STRING(255),
+      allowNull: true
     }
-}, { timestamps: true })
-
-module.exports = mongoose.model("Post", PostSchema)
+  }, {
+    sequelize,
+    tableName: 'Post',
+    schema: 'public',
+    timestamps: true,
+    indexes: [
+      {
+        name: "Post_pkey",
+        unique: true,
+        fields: [
+          { name: "id" },
+        ]
+      },
+    ]
+  });
+};

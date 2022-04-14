@@ -1,0 +1,141 @@
+.replyContainer {
+    margin-left: 30px;
+}
+
+/* .commentImg {
+    width: 100px;
+    max-height: 500px;
+    border-radius: 30px;
+    object-fit: fill;
+}
+.commentProfileImg {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.replyProfileImg {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.commentContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+.comment {
+    display: flex;
+    flex-direction: column;
+}
+.commentBar {
+    display: flex;
+    background-color: transparent;
+    width: fit-content; 
+    height: fit-content;
+    align-items: center;
+}
+.bar {
+    justify-content: start;
+    width: fit-content;
+    height: fit-content;
+    background-color: gainsboro;
+    border-radius: 30px;
+}
+.commentResponses {
+    display: flex;
+    margin-top: 5px;
+    justify-content: start;
+    margin-left: 20px;
+}
+
+.commentRes {
+    font-size: 12px;
+    color: gray;
+    margin-right: 15px;
+    cursor: pointer;
+}
+
+.commentTxt {
+    margin: 0 10px;
+    padding: 3px;
+    font-size: 14px;
+    color: gray;
+}
+.commentLikes {
+    display: flex;
+    width: fit-content;
+    height: fit-content;
+    border-radius: 30px;
+}
+
+.commentUsername {
+    margin: 0 10px;
+    padding: 3px;
+    font-weight: bold;
+    font-size: 14px;
+    color: gray;
+}
+.reply {
+    margin-top: 10px;
+    display: flex;
+    align-content: center;
+}
+.replyInputBar {
+    margin-left: 5px;
+    padding: 3px;
+    width: 100%;
+    height: 25px;
+    background-color: gainsboro;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.replyInput{
+    margin-left: 10px;
+    background-color: transparent;
+    border: none;
+    width: 70%;
+}
+.replyOptions{
+    display: flex;
+    margin-left: 15px;
+    cursor: pointer;
+}
+.replyIcon{
+    font-size: 18px;
+    margin-right: 15px;
+    color: gray;
+}
+.imgContainer {
+    width: 100%;
+    padding: 0 20px 10px 20px;
+    position: relative;
+}
+.img {
+    width: 100px;
+    object-fit: cover;
+    justify-content: center;
+}
+.cancel {
+    position: absolute;
+    top: 0;
+    right: 20px;
+    cursor: pointer;
+    opacity: 0.7;
+}
+.like {
+    width: 20px;
+    height: 20px;
+    margin-left: 5px;
+    cursor: pointer;
+}
+.likeNumber {
+    margin-left: 3px;
+    align-self: center;
+    font-size: 13px;
+    font-weight: bold;
+    color: gray;
+} */

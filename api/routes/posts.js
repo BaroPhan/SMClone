@@ -1,63 +1,68 @@
 const router = require('express').Router()
-const Post = require('../models/Post')
-const User = require('../models/User')
+// const Post = require('../models/Post')
+// const User = require('../models/User1')
+
+const { sequelize } = require('../models');
+var initModels = require("../models/init-models");
+var models = initModels(sequelize);
+
+const { verifyTokenAndAdmin, verifyTokenAndAuthorization } = require('./verifyToken')
+
 
 //create post
-router.post('/', async (req, res) => {
-    const newPost = new Post(req.body)
+router.post('/', verifyTokenAndAuthorization, async (req, res) => {
     try {
-        const savedPost = await newPost.save()
-        res.status(200).json(savedPost)
+        const newPost = await models.Post.create(req.body)
+        res.status(200).json(newPost)
     } catch (error) {
+        console.log(error)
         res.status(500).json(error)
     }
 })
 //update post
-router.put('/:id', async (req, res) => {
+router.put('/:id', verifyTokenAndAuthorization, async (req, res) => {
     try {
-        const currentPost = await Post.findById(req.params.id)
-        if (currentPost.userId === req.body.userId) {
-            try {
-                await currentPost.updateOne({ $set: req.body })
-
-                res.status(200).json("You have updated your post")
-            } catch (error) {
-                res.status(500).json(error)
+        const updatedPost = await models.Post.update(req.body, {
+            where: {
+                id: req.params.id
             }
-        } else res.status(403).json("You can only edit your post")
+        });
+        res.status(200).json("You have updated your post")
     } catch (error) {
         res.status(500).json(error)
     }
 
 })
 //delete post
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', verifyTokenAndAuthorization, async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id)
-        if (post.userId === req.body.userId) {
-            try {
-                await post.delete()
-                res.status(200).json("Post has been deleted")
-            } catch (error) {
-                res.status(500).json(error)
-            }
-
-        } else res.status(403).json("You can only delete your post")
+        const post = await models.Post.findOne({ where: { id: req.params.id } })
+        await post.destroy()
+        res.status(200).json("Post has been deleted")
     } catch (error) {
         res.status(500).json(error)
     }
 })
 
 //like a post
-router.put('/:id/like', async (req, res) => {
+router.put('/:id/like', verifyTokenAndAuthorization, async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id)
-        if (!post.likes.includes(req.body.userId)) {
-            await post.updateOne({ $push: { likes: req.body.userId } })
-            res.status(200).json("You have liked the post")
-        } else {
-            await post.updateOne({ $pull: { likes: req.body.userId } })
+        const is_liked = await models.PostLike.findOne({
+            where:
+            {
+                user_id: req.body.user_id,
+                post_id: req.params.id
+            }
+        })
+        if (is_liked) {
+            await is_liked.destroy({ truncate: true })
             res.status(200).json("You have unliked the post")
+        } else {
+            const new_like = await models.PostLike.create({
+                user_id: req.body.user_id,
+                post_id: req.params.id
+            })
+            res.status(200).json("You have liked the post")
         }
     } catch (error) {
         res.status(500).json(error)
@@ -66,23 +71,50 @@ router.put('/:id/like', async (req, res) => {
 //get a post
 router.get('/:id', async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id)
+        const post = await models.Post.findOne({ where: { id: req.params.id } })
         post ? res.status(200).json(post) : res.status(404).json("No post found")
     } catch (error) {
         res.status(500).json(error)
     }
 })
 //get timeline posts 
-router.get('/timeline/:userId', async (req, res) => {
+router.get('/timeline/:id', verifyTokenAndAuthorization, async (req, res) => {
     try {
-        const currentUser = await User.findById(req.params.userId)
-        const userPosts = await Post.find({ userId: currentUser._id })
-        const friendPosts = await Promise.all(
-            currentUser.followings.map(friendId => {
-                return Post.find({ userId: friendId })
-            })
-        )
-        res.status(200).json(userPosts.concat(...friendPosts))
+        const friends = await models.Follow.findAll({
+            where: { user_id: req.params.id },
+            attributes: ['follow_user_id']
+        })
+        feed = [req.params.id]
+        friends.map(friend => {
+            feed.push(friend.follow_user_id)
+        })
+        const timeline = await models.Post.findAll({
+            where: { user_id: feed },
+            include: [
+                {
+                    association: "user",
+                    attributes: ['username', 'profile_picture']
+                },
+                {
+                    association: "PostLikes",
+                    attributes: ['user_id']
+                },
+                {
+                    association: "Comments",
+                    include: [
+                        {
+                            association: "user",
+                            attributes: ['username', 'profile_picture'],
+                        },
+                        {
+                            association: "CommentLikes",
+                            attributes: ['user_id'],
+                        },
+                    ],
+                },
+            ],
+        })
+        res.status(200).json(timeline)
     } catch (error) {
         console.log(error);
         res.status(500).json(error)
@@ -91,9 +123,26 @@ router.get('/timeline/:userId', async (req, res) => {
 //get all user's posts
 router.get('/profile/:username', async (req, res) => {
     try {
-        const currentUser = await User.findOne({username: req.params.username})
-        const userPosts = await Post.find({ userId: currentUser._id })
-        res.status(200).json(userPosts)
+        const currentUser = await models.User.findOne({
+            where: { username: req.params.username },
+            include: [
+                {
+                    association: "Posts",
+                    include: [
+                        {
+                            association: "Comments",
+                            include: [
+                                {
+                                    association: "user",
+                                    attributes: ['username', 'profile_picture'],
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+        })
+        res.status(200).json(currentUser.Posts)
     } catch (error) {
         console.log(error);
         res.status(500).json(error)

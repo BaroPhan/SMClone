@@ -1,20 +1,21 @@
-import { useContext, useRef } from 'react'
 import './login.css'
-import { loginCall } from '../../apiCalls'
-import { AuthContext } from '../../context/AuthContext'
+import { useRef } from 'react'
+import { login } from '../../redux/apiCalls'
+// import { AuthContext } from '../../context/AuthContext'
 import CircularProgress from '@mui/material/CircularProgress';
 import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function Login() {
     const email = useRef()
     const password = useRef()
-    const { user, isFetching, error, dispatch } = useContext(AuthContext)
+    const { isFetching, error } = useSelector(state => state.user)
+    const dispatch = useDispatch()
 
     const handleClick = (e) => {
         e.preventDefault()
-        loginCall({ email: email.current.value, password: password.current.value }, dispatch);
+        login({ email: email.current.value, password: password.current.value }, dispatch);
     }
-    console.log(user);
     return (
         <div className="login">
             <div className="loginWrapper">
@@ -26,7 +27,7 @@ export default function Login() {
                 <div className="loginRight">
                     <form className="loginBox" onSubmit={handleClick}>
                         <input placeholder="Email" type="email" required ref={email} className="loginInput" />
-                        <input placeholder="Password" type="password" required minLength="6" ref={password} className="loginInput" />
+                        <input placeholder="Password" type="password" required minLength="4" ref={password} className="loginInput" />
                         <span className="loginError" style={{ display: error ? "block" : "none" }}>Incorrect password or username</span>
                         <button className="loginButton" type="submit" disabled={isFetching}>
                             {isFetching ? <CircularProgress color="inherit" size="20px" /> : "Log In"}

@@ -1,36 +1,71 @@
 import './post.css'
-import { MoreVert } from '@mui/icons-material';
-import { useContext, useEffect, useState } from 'react';
-import axios from 'axios';
+import { CameraAltOutlined, Cancel, MoreVert } from '@mui/icons-material';
+import { useEffect, useRef, useState } from 'react';
 import { format } from 'timeago.js';
 import { Link } from 'react-router-dom'
-import { AuthContext } from "../../context/AuthContext";
+import { addComment, likeHandler, uploadImg } from '../../redux/apiCalls'
+import { useDispatch, useSelector } from 'react-redux';
+import { CommentTree } from '../commentTree/CommentTree';
 
 export default function Post({ post }) {
     const PF = process.env.REACT_APP_PUBLIC_FOLDER
 
-    const [user, setUser] = useState([])
-    const [like, setLike] = useState(post.likes.length)
-    const [isLiked, setIsLiked] = useState(false)
-    const { user: currentUser } = useContext(AuthContext)
+    // const [user, setUser] = useState([])
+    // const [like, setLike] = useState()
+    const [commentImg, setCommentImg] = useState()
+    // const [comments, setComments] = useState()
+    const [showComment, setshowComment] = useState(false)
+    // const [isLiked, setIsLiked] = useState(false)
+    const currentUser = useSelector(state => state.user.currentUser)
+    const commentRef = useRef()
+    const dispatch = useDispatch()
 
     useEffect(() => {
-        const fetchUser = async () => {
-            const res = await axios.get(`/user?userId=${post.userId}`)
-            setUser(res.data)
+        // const fetchUser = async () => {
+        //     const res = await publicRequest.get(`/user?userId=${post.user_id}`)
+        //     setUser(res.data)
+        // }
+        // const fetchLike = async () => {
+        //     const res = await publicRequest.get(`/like/${post.id}`)
+        //     setLike(res.data.count)
+        //     res.data.rows.map(row => {
+        //         if (row.user_id === currentUser.id) {
+        //             setIsLiked(true)
+        //         }
+        //     })
+        // }
+        // const fetchComment = async () => {
+        //     const res = await publicRequest.get(`/comment/post/${post.id}`);
+        //     setComments(res.data)
+        // }
+        // fetchUser()
+        // fetchLike()
+        // fetchComment()
+    }, [post.user_id, post.id, currentUser.id])
+
+
+    const cancel = async () => {
+        setCommentImg(null)
+        document.getElementById('img').value = "";
+    }
+    const commentHandler = async (post_id, e) => {
+        e.preventDefault()
+        var newComment = {
+            user_id: currentUser.id,
+            post_id: post_id,
+            desc: commentRef.current.value
         }
-        fetchUser()
-    }, [post.userId])
-    useEffect(() => {
-        setIsLiked(post.likes.includes(currentUser._id))
-    }, [post.likes, currentUser._id])
-
-    const likeHandler = async () => {
-        try {
-            await axios.put('/post/' + post._id + '/like', { userId: currentUser._id })
-        } catch (error) { }
-        setLike(isLiked ? like - 1 : like + 1)
-        setIsLiked(!isLiked)
+        if (commentImg) {
+            uploadImg(commentImg).then((res, err) => {
+                newComment = { ...newComment, img: res }
+                cancel()
+                addComment(newComment, dispatch)
+            })
+        } else {
+            addComment(newComment, dispatch)
+        }
+        document.getElementById('input').value = ''
+        document.getElementById('input').blur()
     }
 
     return (
@@ -38,10 +73,10 @@ export default function Post({ post }) {
             <div className="postWrapper">
                 <div className="postTop">
                     <div className="postTopLeft">
-                        <Link to={`/profile/${user.username}`} style={{ textDecoration: 'none' }}>
-                            <img src={user.profilePicture ? PF + user.profilePicture : PF + "person/noAvatar.png"} alt="" className="postProfileImg" />
+                        <Link to={`/profile/${post.user?.username}`} style={{ textDecoration: 'none' }}>
+                            <img src={post.user?.profile_picture ? PF + post.user?.profile_picture : PF + "person/noAvatar.png"} alt="" className="postProfileImg" />
                         </Link>
-                        <span className="postUsername">{user.username}</span>
+                        <span className="postUsername">{post.user?.username}</span>
                         <span className="postDate">{format(post.createdAt)}</span>
                     </div>
                     <div className="postTopRight">
@@ -50,18 +85,47 @@ export default function Post({ post }) {
                 </div>
                 <div className="postCenter">
                     <span className="postText">{post?.desc}</span>
-                    <img src={PF + post.img} alt="" className="postImg" />
+                    <img src={post.img} alt="" className="postImg" />
                 </div>
+                <hr className="postHr" />
                 <div className="postBottom">
                     <div className="postBottomLeft">
-                        <img className="likeIcon" src={`${PF}like.png`} onClick={likeHandler} alt="" />
-                        <img className="likeIcon" src={`${PF}heart.png`} onClick={likeHandler} alt="" />
-                        <span className="postLikeCounter">{like} people like it</span>
+                        <img className="likeIcon" src={`${PF}like.png`} onClick={(e) => likeHandler("post", post, currentUser, dispatch)} alt="" />
+                        <img className="likeIcon" src={`${PF}heart.png`} onClick={(e) => likeHandler("post", post, currentUser, dispatch)} alt="" />
+                        <span className="postLikeCounter">{post.PostLikes?.length} people like it</span>
                     </div>
                     <div className="postBottomRight">
-                        <span className="postCommentText">{post.comment} comments</span>
+                        <span className="postCommentText" onClick={() => setshowComment(!showComment)}>{post.comment} comments</span>
                     </div>
                 </div>
+                {showComment &&
+                    <>
+                        <form onSubmit={(e) => commentHandler(post.id, e)}>
+                            <hr className="postHr" />
+                            <div className="postComment">
+                                <Link to={`/profile/${currentUser.username}`} style={{ textDecoration: 'none' }}>
+                                    <img src={currentUser.profile_picture ? PF + currentUser.profile_picture : PF + "person/noAvatar.png"} alt="" className="postProfileImg" />
+                                </Link>
+                                <div className="commentInputBar">
+                                    <input id="input" placeholder="Write a comment..." className="commentInput" ref={commentRef} />
+                                    <label className='commentOptions'>
+                                        <CameraAltOutlined className='commentIcon' />
+                                        <input id='img' name='img' type='file' accept='.png, .jpg, .jpeg' onChange={(e) => setCommentImg(e.target.files[0])} style={{ display: 'none' }} />
+                                    </label>
+                                </div>
+                            </div>
+                            {commentImg && <div className="postComment">
+                                <div className="commentImgContainer">
+                                    <img src={URL.createObjectURL(commentImg)} alt="" className="commentImg" />
+                                    <Cancel className='cancel' onClick={cancel} />
+                                </div>
+                            </div>}
+                        </form>
+                        {post.Comments &&
+                            <CommentTree comments={post.Comments} />
+                        }
+                    </>
+                }
             </div>
         </div>
     )

@@ -1,56 +1,75 @@
-const mongoose = require('mongoose')
-
-const UserSchema = new mongoose.Schema({
+const Sequelize = require('sequelize');
+module.exports = function(sequelize, DataTypes) {
+  return sequelize.define('User', {
+    id: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      primaryKey: true,
+      defaultValue: DataTypes.UUIDV4
+    },
     username: {
-        type: String,
-        require: true,
-        min: 3,
-        max: 20,
-        unique: true
+      type: DataTypes.STRING(255),
+      allowNull: false,
+      unique: "User_username_key"
     },
     email: {
-        type: String,
-        require: true,
-        max: 50,
-        unique: true
+      type: DataTypes.STRING(255),
+      allowNull: false,
+      unique: "User_email_key"
     },
     password: {
-        type: String,
-        require: true,
-        min: 6,
+      type: DataTypes.STRING(255),
+      allowNull: false
     },
-    profilePicture: {
-        type: String,
-        default: ""
+    profile_picture: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      defaultValue: ""
     },
-    followers: {
-        type: Array,
-        default: []
-    },
-    followings: {
-        type: Array,
-        default: []
-    },
-    isAdmin: {
-        type: Boolean,
-        default: false
+    is_admin: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false
     },
     desc: {
-        type: String,
-        max: 50
-    },
-    city: {
-        type: String,
-        max: 50
+      type: DataTypes.STRING(255),
+      allowNull: true
     },
     from: {
-        type: String,
-        max: 50
+      type: DataTypes.STRING(255),
+      allowNull: true
     },
     relationship: {
-        type: Number,
-        enum: [1, 2, 3]
+      type: DataTypes.ENUM("Single","In a relationship","Complicated"),
+      allowNull: true
     }
-}, { timestamps: true })
-
-module.exports = mongoose.model("User", UserSchema)
+  }, {
+    sequelize,
+    tableName: 'User',
+    schema: 'public',
+    timestamps: true,
+    indexes: [
+      {
+        name: "User_email_key",
+        unique: true,
+        fields: [
+          { name: "email" },
+        ]
+      },
+      {
+        name: "User_pkey",
+        unique: true,
+        fields: [
+          { name: "id" },
+        ]
+      },
+      {
+        name: "User_username_key",
+        unique: true,
+        fields: [
+          { name: "username" },
+        ]
+      },
+    ]
+  });
+};

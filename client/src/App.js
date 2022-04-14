@@ -3,11 +3,12 @@ import Login from "./pages/login/Login.jsx";
 import Profile from "./pages/profile/Profile.jsx";
 import Register from "./pages/register/Register.jsx";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { useContext } from "react";
-import { AuthContext } from "./context/AuthContext.js";
+import { useSelector } from "react-redux";
+// import { useContext } from "react";
+// import { AuthContext } from "./context/AuthContext.js";
 
 function App() {
-  const { user } = useContext(AuthContext)
+  const user = useSelector((state) => state.user.currentUser)
   return (
     <Router>
       <Routes>
