@@ -3,7 +3,7 @@ import Share from '../../components/share/Share'
 import Post from '../../components/post/Post'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getPosts } from '../../redux/apiCalls'
+import { getComments, getPosts } from '../../redux/apiCalls'
 
 export default function Feed({ username }) {
     const dispatch = useDispatch()
@@ -12,6 +12,7 @@ export default function Feed({ username }) {
 
     useEffect(() => {
         getPosts(username, currentUser, dispatch)
+        getComments(dispatch)
     }, [username, currentUser, dispatch])
     return (
         <div className="feed">

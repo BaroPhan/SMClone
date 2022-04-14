@@ -50,18 +50,18 @@ const postSlice = createSlice({
             state.error = true; state.isFetching = false;
         },
         //ADD COMMENT
-        addCommentStart: (state) => {
-            state.isFetching = true;
-            state.error = false;
-        },
-        addCommentSuccess: (state, action) => {
-            state.isFetching = false;
-            state.posts[state.posts.findIndex(item => item.id === action.payload.post_id)].Comments.push(action.payload)
-            state.error = false;
-        },
-        addCommentFailure: (state) => {
-            state.error = true; state.isFetching = false;
-        },
+        // addCommentStart: (state) => {
+        //     state.isFetching = true;
+        //     state.error = false;
+        // },
+        // addCommentSuccess: (state, action) => {
+        //     state.isFetching = false;
+        //     state.posts[state.posts.findIndex(item => item.id === action.payload.post_id)].Comments.push(action.payload)
+        //     state.error = false;
+        // },
+        // addCommentFailure: (state) => {
+        //     state.error = true; state.isFetching = false;
+        // },
         //LIKE POST
         likePostStart: (state) => {
             state.isFetching = true;
@@ -76,19 +76,19 @@ const postSlice = createSlice({
             state.error = true; state.isFetching = false;
         },
         //LIKE COMMENT
-        likeCommentStart: (state) => {
-            state.isFetching = true;
-            state.error = false;
-        },
-        likeCommentSuccess: (state, action) => {
-            const comment_index = state.posts[state.posts.findIndex(item => item.id === action.payload.data.post_id)].Comments.findIndex(item => item.id === action.payload.data.id)
-            state.isFetching = false;
-            state.posts[state.posts.findIndex(item => item.id === action.payload.data.post_id)].Comments[comment_index].CommentLikes = action.payload.package
-            state.error = false;
-        },
-        likeCommentFailure: (state) => {
-            state.error = true; state.isFetching = false;
-        },
+        // likeCommentStart: (state) => {
+        //     state.isFetching = true;
+        //     state.error = false;
+        // },
+        // likeCommentSuccess: (state, action) => {
+        //     const comment_index = state.posts[state.posts.findIndex(item => item.id === action.payload.data.post_id)].Comments.findIndex(item => item.id === action.payload.data.id)
+        //     state.isFetching = false;
+        //     state.posts[state.posts.findIndex(item => item.id === action.payload.data.post_id)].Comments[comment_index].CommentLikes = action.payload.package
+        //     state.error = false;
+        // },
+        // likeCommentFailure: (state) => {
+        //     state.error = true; state.isFetching = false;
+        // },
         //ADD Post
         addPostStart: (state) => {
             state.isFetching = true;
@@ -110,8 +110,8 @@ export const {
     deletePostStart, deletePostSuccess, deletePostFailure,
     updatePostFailure, updatePostSuccess, updatePostStart,
     addPostFailure, addPostSuccess, addPostStart,
-    addCommentStart, addCommentSuccess, addCommentFailure,
+    // addCommentStart, addCommentSuccess, addCommentFailure,
     likePostStart, likePostSuccess, likePostFailure,
-    likeCommentStart, likeCommentSuccess, likeCommentFailure
+    // likeCommentStart, likeCommentSuccess, likeCommentFailure
 } = postSlice.actions
 export default postSlice.reducer

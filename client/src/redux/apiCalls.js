@@ -1,8 +1,9 @@
 import { publicRequest, userRequest } from "../requestMethods"
-import { addPostFailure, addPostStart, addPostSuccess, getPostsFailure, getPostsStart, getPostsSuccess, addCommentStart, addCommentSuccess, addCommentFailure, likePostStart, likePostSuccess, likePostFailure, likeCommentStart, likeCommentSuccess } from "./postRedux";
+import { addPostFailure, addPostStart, addPostSuccess, getPostsFailure, getPostsStart, getPostsSuccess, likePostStart, likePostSuccess, likePostFailure } from "./postRedux";
 import { loginFailure, loginStart, loginSuccess, resetState } from "./userRedux";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import app from '../firebase'
+import { addCommentFailure, addCommentStart, addCommentSuccess, getCommentsFailure, getCommentsStart, getCommentsSuccess, likeCommentFailure, likeCommentStart, likeCommentSuccess, updateCommentFailure, updateCommentStart, updateCommentSuccess } from "./commentRedux";
 
 //USER
 //LOGIN
@@ -54,6 +55,16 @@ export const getPosts = async (username, currentUser, dispatch) => {
         dispatch(getPostsFailure());
     }
 }
+//GET COMMENTS
+export const getComments = async (dispatch) => {
+    dispatch(getCommentsStart());
+    try {
+        const res = await publicRequest.get("/comment/")
+        dispatch(getCommentsSuccess(res.data));
+    } catch (err) {
+        dispatch(getCommentsFailure());
+    }
+}
 //ADD COMMENT
 export const addComment = async (comment, dispatch) => {
     dispatch(addCommentStart());
@@ -66,12 +77,12 @@ export const addComment = async (comment, dispatch) => {
 }
 //GET REPLIES
 export const fetchReplies = async (comments, dispatch) => {
-    dispatch(addCommentStart());
+    dispatch(updateCommentStart());
     try {
-        const res = await publicRequest.post('/comment/get_replies', comments)
-        dispatch(addCommentSuccess(res.data));
+        const res = await publicRequest.post('/comment/replies', comments)
+        dispatch(updateCommentSuccess(res.data));
     } catch (err) {
-        dispatch(addCommentFailure());
+        dispatch(updateCommentFailure());
     }
 }
 //LIKE HANDLER 
@@ -89,9 +100,9 @@ export const likeHandler = async (type, data, currentUser, dispatch) => {
         dispatch(likeCommentStart());
         try {
             const res = await userRequest.post(`/like/comment/${data.id}`, { user_id: currentUser.id })
-            dispatch(likeCommentSuccess({ package: res.data, data: data }));
+            dispatch(likeCommentSuccess({ package: res.data, id: data.id }));
         } catch (error) {
-            dispatch(likePostFailure());
+            dispatch(likeCommentFailure());
         }
     }
 }

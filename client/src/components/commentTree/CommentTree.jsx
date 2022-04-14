@@ -1,27 +1,22 @@
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
+import { useDispatch, useSelector } from "react-redux"
 import { Comment } from "../../comment/Comment"
-import { publicRequest } from "../../requestMethods"
+import { fetchReplies } from "../../redux/apiCalls"
 import './commentTree.css'
 
 export const CommentTree = ({ comments }) => {
-    const [replies, setReplies] = useState()
+    const dispatch = useDispatch()
     useEffect(() => {
-        const fetchReplies = async () => {
-            const res = await publicRequest.post('/comment/get_replies', comments)
-            console.log(res.data);
-            setReplies(res.data)
-        }
-        fetchReplies()
-    }, [comments])
-
+        fetchReplies(comments, dispatch)
+    },[comments, dispatch])
     return (
         <div>
-            {console.log(replies)}
-            {replies?.map(comment => {
+            {comments?.map(comment => {
                 return (<>
                     {/* {console.log(replies)}*/}
                     <Comment key={comment.id} comment={comment} />
-                    {comment?.Comments?.length > 0 && <>
+                    {comment.Comments?.length > 0 && <>
+                        {console.log("yes", comment.Comments)}
                         <div className="replyContainer">
                             <CommentTree comments={comment?.Comments} />
                         </div>

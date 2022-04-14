@@ -75,8 +75,29 @@ router.get('/post/:id', async (req, res) => {
         res.status(500).json(error)
     }
 })
+//get all comments
+router.get('/', async (req, res) => {
+    try {
+        const comment = await models.Comment.findAll({
+            include: [
+                {
+                    association: "user",
+                    attributes: ['username', 'profile_picture'],
+                },
+                {
+                    association: "CommentLikes",
+                    attributes: ['user_id'],
+                },
+            ],
+        })
+        res.status(200).json(comment)
+    } catch (error) {
+        console.log(error);
+        res.status(500).json(error)
+    }
+})
 //get comment
-router.get('/:id', async (req, res) => {
+router.get('/comment/:id', async (req, res) => {
     try {
         const comment = await models.Comment.findOne({
             where: { id: req.params.id },
@@ -93,11 +114,11 @@ router.get('/:id', async (req, res) => {
     }
 })
 //get replies
-router.post('/get_replies/', async (req, res) => {
+router.post('/replies/', async (req, res) => {
     try {
         const comments = await Promise.all(req.body.map(item => {
             return models.Comment.findOne({
-                where: { id: item.id},
+                where: { id: item.id },
                 include: [
                     {
                         association: "user",
@@ -112,7 +133,7 @@ router.post('/get_replies/', async (req, res) => {
                     },
                 ],
             })
-        }))        
+        }))
         res.status(200).json(comments)
     } catch (error) {
         console.log(error);

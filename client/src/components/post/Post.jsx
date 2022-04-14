@@ -17,32 +17,9 @@ export default function Post({ post }) {
     const [showComment, setshowComment] = useState(false)
     // const [isLiked, setIsLiked] = useState(false)
     const currentUser = useSelector(state => state.user.currentUser)
+    const comments = useSelector(state => state.comment.comments).filter(item => item.post_id === post.id);
     const commentRef = useRef()
     const dispatch = useDispatch()
-
-    useEffect(() => {
-        // const fetchUser = async () => {
-        //     const res = await publicRequest.get(`/user?userId=${post.user_id}`)
-        //     setUser(res.data)
-        // }
-        // const fetchLike = async () => {
-        //     const res = await publicRequest.get(`/like/${post.id}`)
-        //     setLike(res.data.count)
-        //     res.data.rows.map(row => {
-        //         if (row.user_id === currentUser.id) {
-        //             setIsLiked(true)
-        //         }
-        //     })
-        // }
-        // const fetchComment = async () => {
-        //     const res = await publicRequest.get(`/comment/post/${post.id}`);
-        //     setComments(res.data)
-        // }
-        // fetchUser()
-        // fetchLike()
-        // fetchComment()
-    }, [post.user_id, post.id, currentUser.id])
-
 
     const cancel = async () => {
         setCommentImg(null)
@@ -121,8 +98,8 @@ export default function Post({ post }) {
                                 </div>
                             </div>}
                         </form>
-                        {post.Comments &&
-                            <CommentTree comments={post.Comments} />
+                        {comments &&
+                            <CommentTree comments={comments} />
                         }
                     </>
                 }
