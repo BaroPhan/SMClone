@@ -88,6 +88,19 @@ router.get('/', async (req, res) => {
                     association: "CommentLikes",
                     attributes: ['user_id'],
                 },
+                {
+                    association: "Comments",
+                    include: [
+                        {
+                            association: "user",
+                            attributes: ['username', 'profile_picture'],
+                        },
+                        {
+                            association: "CommentLikes",
+                            attributes: ['user_id'],
+                        },
+                    ]
+                },
             ],
         })
         res.status(200).json(comment)
@@ -103,7 +116,25 @@ router.get('/comment/:id', async (req, res) => {
             where: { id: req.params.id },
             include: [
                 {
+                    association: "user",
+                    attributes: ['username', 'profile_picture'],
+                },
+                {
+                    association: "CommentLikes",
+                    attributes: ['user_id'],
+                },
+                {
                     association: "Comments",
+                    include: [
+                        {
+                            association: "user",
+                            attributes: ['username', 'profile_picture'],
+                        },
+                        {
+                            association: "CommentLikes",
+                            attributes: ['user_id'],
+                        },
+                    ]
                 },
             ],
         })
@@ -130,6 +161,16 @@ router.post('/replies/', async (req, res) => {
                     },
                     {
                         association: "Comments",
+                        include: [
+                            {
+                                association: "user",
+                                attributes: ['username', 'profile_picture'],
+                            },
+                            {
+                                association: "CommentLikes",
+                                attributes: ['user_id'],
+                            },
+                        ]
                     },
                 ],
             })

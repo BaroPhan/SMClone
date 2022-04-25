@@ -1,17 +1,23 @@
 import './login.css'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { login } from '../../redux/apiCalls'
 // import { AuthContext } from '../../context/AuthContext'
 import CircularProgress from '@mui/material/CircularProgress';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { io } from 'socket.io-client';
 
 export default function Login() {
     const email = useRef()
     const password = useRef()
     const { isFetching, error } = useSelector(state => state.user)
     const dispatch = useDispatch()
-
+    // const socket = io("ws://localhost:8900");
+    // useEffect(() => {
+    //     socket.on("getUsers", (users) => {
+    //         console.log(users);
+    //     });
+    // })
     const handleClick = (e) => {
         e.preventDefault()
         login({ email: email.current.value, password: password.current.value }, dispatch);

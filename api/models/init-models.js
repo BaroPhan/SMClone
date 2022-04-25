@@ -1,7 +1,9 @@
 var DataTypes = require("sequelize").DataTypes;
 var _Comment = require("./Comment");
 var _CommentLike = require("./CommentLike");
+var _Conversation = require("./Conversation");
 var _Follow = require("./Follow");
+var _Messages = require("./Messages");
 var _Post = require("./Post");
 var _PostLike = require("./PostLike");
 var _SequelizeMeta = require("./SequelizeMeta");
@@ -10,7 +12,9 @@ var _User = require("./User");
 function initModels(sequelize) {
   var Comment = _Comment(sequelize, DataTypes);
   var CommentLike = _CommentLike(sequelize, DataTypes);
+  var Conversation = _Conversation(sequelize, DataTypes);
   var Follow = _Follow(sequelize, DataTypes);
+  var Messages = _Messages(sequelize, DataTypes);
   var Post = _Post(sequelize, DataTypes);
   var PostLike = _PostLike(sequelize, DataTypes);
   var SequelizeMeta = _SequelizeMeta(sequelize, DataTypes);
@@ -26,6 +30,8 @@ function initModels(sequelize) {
   Comment.hasMany(Comment, { as: "Comments", foreignKey: "parent_id"});
   CommentLike.belongsTo(Comment, { as: "comment", foreignKey: "comment_id"});
   Comment.hasMany(CommentLike, { as: "CommentLikes", foreignKey: "comment_id"});
+  Messages.belongsTo(Conversation, { as: "conversation", foreignKey: "conversation_id"});
+  Conversation.hasMany(Messages, { as: "Messages", foreignKey: "conversation_id"});
   Comment.belongsTo(Post, { as: "post", foreignKey: "post_id"});
   Post.hasMany(Comment, { as: "Comments", foreignKey: "post_id"});
   PostLike.belongsTo(Post, { as: "post", foreignKey: "post_id"});
@@ -38,6 +44,8 @@ function initModels(sequelize) {
   User.hasMany(Follow, { as: "Follows", foreignKey: "follow_user_id"});
   Follow.belongsTo(User, { as: "user", foreignKey: "user_id"});
   User.hasMany(Follow, { as: "user_Follows", foreignKey: "user_id"});
+  Messages.belongsTo(User, { as: "sender", foreignKey: "sender_id"});
+  User.hasMany(Messages, { as: "Messages", foreignKey: "sender_id"});
   Post.belongsTo(User, { as: "user", foreignKey: "user_id"});
   User.hasMany(Post, { as: "Posts", foreignKey: "user_id"});
   PostLike.belongsTo(User, { as: "user", foreignKey: "user_id"});
@@ -46,7 +54,9 @@ function initModels(sequelize) {
   return {
     Comment,
     CommentLike,
+    Conversation,
     Follow,
+    Messages,
     Post,
     PostLike,
     SequelizeMeta,

@@ -104,3 +104,119 @@
 .rightbarFollowButton:focus{
     outline: none;
 }
+
+.editProfileHr {
+    margin-top: 15px;
+    color: gray;
+    height: 2px;
+    border: none;
+    background-color: gainsboro;
+}
+
+.editContainer {
+    padding: 5px;
+    width: 500px;
+}
+.editCard {
+    display: flex;
+    flex-direction: column;
+}
+.titleContainer{
+    width: 100%;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.title {
+    font-weight: 500;
+    font-size: 18px;
+}
+.editProfileImg {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+.editProfileImgText {
+    font-weight: 400;
+    font-size: 18px;
+}
+.profileImg {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.coverImg {
+    width: 80%;
+    height: 150px;
+    object-fit: fill;
+}
+.imageContainer {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.editProfileInput {
+    margin: 10px;
+    border: none;
+    align-items: center;
+    font-weight: 300;
+    font-size: 18px;
+    width: 100%;
+}
+.editProfileBtn{
+    border: none;
+    width: 60%;
+    padding: 7px;
+    height: 50px;
+    border-radius: 5px;
+    background-color: #1872f2;
+    font-weight: 500;
+    font-size: 20px;
+    margin-right: 20px;
+    cursor: pointer;
+    color: white;
+}
+
+.modalProfile {
+    font-size: 12px;
+    width: 100%;
+    border-radius: 10px;
+    padding: 5px;
+    -webkit-box-shadow: 0px 0px 16px -8px rgba(0, 0, 0, 0.68);
+    box-shadow: 0px 0px 16px -8px rgba(0, 0, 0, 0.68);
+    background-color: white;
+}
+.modalProfile > .header {
+    width: 100%;
+    font-weight: 500;
+    font-size: 18px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.modalProfile > .content {
+    width: 100%;
+}
+.modalProfile > .actions {
+    width: 100%;
+    padding: 10px 5px;
+    margin: auto;
+    text-align: center;
+}
+.modalProfile > .close {
+    cursor: pointer;
+    position: absolute;
+    display: block;
+    padding: 2px 5px;
+    line-height: 20px;
+    right: -10px;
+    top: -10px;
+    font-size: 24px;
+    background: #ffffff;
+    border-radius: 18px;
+    border: 1px solid #cfcece;
+}

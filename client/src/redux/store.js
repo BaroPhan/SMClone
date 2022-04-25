@@ -2,6 +2,7 @@ import { configureStore, combineReducers } from '@reduxjs/toolkit'
 import userReducer from './userRedux'
 import postReducer from './postRedux'
 import commentReducer from './commentRedux'
+import conversationReducer from './conversationRedux'
 
 import {
     persistStore,
@@ -20,7 +21,7 @@ const persistConfig = {
     version: 1,
     storage,
 };
-const rootReducer = combineReducers({ user: userReducer, post: postReducer, comment: commentReducer });
+const rootReducer = combineReducers({ user: userReducer, post: postReducer, comment: commentReducer, conversation: conversationReducer });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 

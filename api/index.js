@@ -8,6 +8,8 @@ const authRoute = require('./routes/auth')
 const postRoute = require('./routes/posts')
 const commentRoute = require('./routes/comment')
 const likeRoute = require('./routes/like')
+const convoRoute = require('./routes/conversation')
+const messageRoute = require('./routes/messages')
 const multer = require('multer')
 const path = require('path')
 const cors = require('cors')
@@ -76,6 +78,8 @@ app.use("/api/auth", authRoute)
 app.use("/api/post", postRoute)
 app.use("/api/comment", commentRoute)
 app.use("/api/like", likeRoute)
+app.use("/api/conversation", convoRoute)
+app.use("/api/message", messageRoute)
 
 app.listen(8800, () => {
     console.log("Server is listening on PORT 8800");

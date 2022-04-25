@@ -4,15 +4,15 @@ import Post from '../../components/post/Post'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getComments, getPosts } from '../../redux/apiCalls'
-
 export default function Feed({ username }) {
     const dispatch = useDispatch()
     const currentUser = useSelector(state => state.user.currentUser)
     const posts = useSelector(state => state.post.posts)
 
-    useEffect(() => {
+    useEffect(() => {     
         getPosts(username, currentUser, dispatch)
         getComments(dispatch)
+
     }, [username, currentUser, dispatch])
     return (
         <div className="feed">

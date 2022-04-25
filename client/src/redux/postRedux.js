@@ -29,7 +29,7 @@ const postSlice = createSlice({
         deletePostSuccess: (state, action) => {
             state.isFetching = false;
             state.posts.splice(
-                state.posts.findIndex(item => item._id === action.payload), 1
+                state.posts.findIndex(item => item.id === action.payload), 1
             )
             state.error = false;
         },
@@ -43,7 +43,7 @@ const postSlice = createSlice({
         },
         updatePostSuccess: (state, action) => {
             state.isFetching = false;
-            state.posts[state.posts.findIndex(item => item._id === action.payload.id)] = action.payload.data;
+            state.posts[state.posts.findIndex(item => item.id === action.payload.id)] = action.payload;
             state.error = false;
         },
         updatePostFailure: (state) => {

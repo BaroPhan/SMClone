@@ -22,13 +22,40 @@ router.post('/', verifyTokenAndAuthorization, async (req, res) => {
 //update post
 router.put('/:id', verifyTokenAndAuthorization, async (req, res) => {
     try {
-        const updatedPost = await models.Post.update(req.body, {
+        await models.Post.update(req.body, {
             where: {
                 id: req.params.id
             }
         });
-        res.status(200).json("You have updated your post")
+        const updatedPost = await models.Post.findOne({
+            where: { id: req.params.id },
+            include: [
+                {
+                    association: "user",
+                    attributes: ['username', 'profile_picture']
+                },
+                {
+                    association: "PostLikes",
+                    attributes: ['user_id']
+                },
+                {
+                    association: "Comments",
+                    include: [
+                        {
+                            association: "user",
+                            attributes: ['username', 'profile_picture'],
+                        },
+                        {
+                            association: "CommentLikes",
+                            attributes: ['user_id'],
+                        },
+                    ],
+                },
+            ],
+        })
+        res.status(200).json(updatedPost)
     } catch (error) {
+        console.log(error)
         res.status(500).json(error)
     }
 

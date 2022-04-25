@@ -1,22 +1,18 @@
-import { useEffect } from "react"
-import { useDispatch, useSelector } from "react-redux"
-import { Comment } from "../../comment/Comment"
-import { fetchReplies } from "../../redux/apiCalls"
+import { useSelector } from "react-redux"
+import { Comment } from "../comment/Comment"
 import './commentTree.css'
 
 export const CommentTree = ({ comments }) => {
-    const dispatch = useDispatch()
-    useEffect(() => {
-        fetchReplies(comments, dispatch)
-    },[comments, dispatch])
+    const feed = useSelector(state => state.comment.comments).filter(item => {
+        return comments.some((c) => (item.id === c.id))
+    })
+
     return (
         <div>
-            {comments?.map(comment => {
+            {feed?.map(comment => {
                 return (<>
-                    {/* {console.log(replies)}*/}
                     <Comment key={comment.id} comment={comment} />
                     {comment.Comments?.length > 0 && <>
-                        {console.log("yes", comment.Comments)}
                         <div className="replyContainer">
                             <CommentTree comments={comment?.Comments} />
                         </div>

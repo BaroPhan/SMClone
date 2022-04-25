@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { Link } from 'react-router-dom'
 import { publicRequest, userRequest } from '../../requestMethods';
-import { Add, Remove } from '@mui/icons-material'
+import { Add, Edit, Remove } from '@mui/icons-material'
 import { useDispatch, useSelector } from 'react-redux'
+import Popup from 'reactjs-popup'
 
 export default function Rightbar({ user }) {
     const PF = process.env.REACT_APP_PUBLIC_FOLDER
@@ -13,6 +14,8 @@ export default function Rightbar({ user }) {
     const dispatch = useDispatch()
 
     const [friends, setFriends] = useState([])
+    const [profileImage, setProfileImage] = useState()
+    const [coverImage, setCoverImage] = useState()
 
     //bool state to check if user is followed or not
     const [followed, setFollowed] = useState()
@@ -57,6 +60,11 @@ export default function Rightbar({ user }) {
         }
     }
 
+    //edit profile
+    const updateProfile = async (e, close) => {
+        e.preventDefault()
+    }
+
     const HomeRightBar = () => {
         return (
             <>
@@ -80,25 +88,119 @@ export default function Rightbar({ user }) {
     const ProfileRightBar = () => {
         return (
             <>
-                {user.username !== currentUser.username && (
-                    <button className="rightbarFollowButton" onClick={handleClick}>
-                        {followed ? "Unfollow" : "Follow"}
-                        {followed ? <Remove /> : <Add />}
-                    </button>
-                )}
+                {user.username !== currentUser.username
+                    ? (
+                        <button className="rightbarFollowButton" onClick={handleClick}>
+                            {followed ? "Unfollow" : "Follow"}
+                            {followed ? <Remove /> : <Add />}
+                        </button>
+                    )
+                    : (
+                        <Popup
+                            trigger={
+                                <button className="rightbarFollowButton" >
+                                    Edit profile <Edit style={{ marginLeft: "10px" }} />
+                                </button>
+                            }
+                            modal
+                        >
+                            {close => (
+                                <form onSubmit={e => updateProfile(e, close)} className="modalProfile">
+                                    <button className="close" onClick={close}>
+                                        &times;
+                                    </button>
+                                    <div className="header"> Edit profile </div>
+                                    <hr className="editProfileHr" />
+                                    <div className="content">
+                                        <div className="editContainer">
+                                            <div className="editCard">
+                                                <div className="titleContainer">
+                                                    <div className="title">Profile picture</div>
+                                                    <label className="editProfileImg">
+                                                        <span className='editProfileImgText'>Edit</span>
+                                                        <input id="file" name="file" type="file" accept=".png, .jpeg, .jpg" onChange={(e) => setProfileImage(e.target.files[0])} style={{ display: "none" }} />
+                                                    </label>
+                                                </div>
+                                                <div className="imageContainer">
+                                                    <img src={profileImage ? URL.createObjectURL(profileImage) : user?.profile_picture ? PF + user?.profile_picture : PF + "person/noAvatar.png"} alt="" className="profileImg" />
+                                                </div>
+                                            </div>
+                                            <div className="editCard">
+                                                <div className="titleContainer">
+                                                    <div className="title">Cover picture</div>
+                                                    <label className="editProfileImg">
+                                                        <span className='editProfileImgText'>Edit</span>
+                                                        <input id="file" name="file" type="file" accept=".png, .jpeg, .jpg" onChange={(e) => setCoverImage(e.target.files[0])} style={{ display: "none" }} />
+                                                    </label>
+                                                </div>
+                                                <div className="imageContainer">
+                                                    <img src={coverImage ? URL.createObjectURL(coverImage) : user?.cover_picture ? PF + user?.cover_picture : PF + "person/noCover.png"} alt="" className="coverImg" />
+                                                </div>
+                                            </div>
+                                            <div className="editCard">
+                                                <div className="titleContainer">
+                                                    <div className="title">Username</div>
+                                                </div>
+                                                <input
+                                                    className="editProfileInput"
+                                                    type="text"
+                                                    defaultValue={user?.username}
+                                                />
+                                            </div>
+                                            <div className="editCard">
+                                                <div className="titleContainer">
+                                                    <div className="title">Username</div>
+                                                </div>
+                                                <input
+                                                    className="editProfileInput"
+                                                    type="text"
+                                                    defaultValue={user?.username}
+                                                />
+                                            </div>
+                                            <div className="editCard">
+                                                <div className="titleContainer">
+                                                    <div className="title">Username</div>
+                                                </div>
+                                                <input
+                                                    className="editProfileInput"
+                                                    type="text"
+                                                    defaultValue={user?.username}
+                                                />
+                                            </div>
+                                            <div className="editCard">
+                                                <div className="titleContainer">
+                                                    <div className="title">Username</div>
+                                                </div>
+                                                <input
+                                                    className="editProfileInput"
+                                                    type="text"
+                                                    defaultValue={user?.username}
+                                                />
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div className="actions">
+                                        <button className="editProfileBtn" type="submit">Edit your profile</button>
+                                    </div>
+                                </form>
+                            )}
+                        </Popup>
+                    )
+                }
                 <h4 className="rightbarTitle">User information</h4>
                 <div className="rightbarInfo">
                     <div className="rightbarInfoItem">
-                        <span className="rightbarInfoKey">City:</span>
+                        <span className="rightbarInfoKey">Email:</span>
                         <span className="rightbarInfoValue">{user.email}</span>
                     </div>
                     <div className="rightbarInfoItem">
                         <span className="rightbarInfoKey">From:</span>
-                        <span className="rightbarInfoValue">{user.email}</span>
+                        <span className="rightbarInfoValue">{user.from}</span>
                     </div>
                     <div className="rightbarInfoItem">
                         <span className="rightbarInfoKey">Relationship:</span>
-                        <span className="rightbarInfoValue">{user.email}</span>
+                        <span className="rightbarInfoValue">{user.relationship}</span>
                     </div>
                 </div>
                 <h4 className="rightbarTitle">User friends</h4>
@@ -122,7 +224,6 @@ export default function Rightbar({ user }) {
     return (
         <div className="rightbar">
             <div className="rightbarWrapper">
-
                 {user ? <ProfileRightBar /> : <HomeRightBar />}
             </div>
         </div>

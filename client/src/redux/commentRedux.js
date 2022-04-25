@@ -43,7 +43,6 @@ const commentSlice = createSlice({
         },
         updateCommentSuccess: (state, action) => {
             state.isFetching = false;
-            console.log(action.payload)
             action.payload.map(comment => {
                 state.comments[state.comments.findIndex(item => item.id === comment.id)] = comment;
             })

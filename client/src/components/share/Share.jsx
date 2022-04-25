@@ -54,7 +54,7 @@ export default function Share({ username }) {
                         <div className="shareOptions">
                             <label htmlFor="file" className="shareOption">
                                 <PermMedia htmlColor="tomato" className="shareIcon" />
-                                <span className="shareOptionText">Photo or Video</span>
+                                <span className="shareOptionText">Photo</span>
                                 <input id="file" name="file" type="file" accept=".png, .jpeg, .jpg" onChange={(e) => setFile(e.target.files[0])} style={{ display: "none" }} />
                             </label>
                             <div className="shareOption">
