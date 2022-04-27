@@ -10,12 +10,9 @@ import Rightbar from "../../components/rightbar/Rightbar";
 import { addMessage, getConvos } from "../../redux/apiCalls";
 
 export default function Messenger() {
-    // const [conversations, setConversations] = useState([]);
     const [currentChat, setCurrentChat] = useState(null);
-    // const [newMessage, setNewMessage] = useState("");
     const [arrivalMessage, setArrivalMessage] = useState(null);
-    // const [onlineUsers, setOnlineUsers] = useState([]);
-    const socket = useRef();
+    const [socket, setSocket] = useState();
 
     const msgRef = useRef()
     const dispatch = useDispatch()
@@ -27,18 +24,20 @@ export default function Messenger() {
     const scrollRef = useRef();
 
     useEffect(() => {
+        setSocket(io("ws://localhost:8900"));
+    }, [])
+    useEffect(() => {
         getConvos(user, dispatch)
     }, [user, dispatch, arrivalMessage])
     useEffect(() => {
-        socket.current = io("ws://localhost:8900");
-        socket.current.on("getMessage", (data) => {
+        socket?.on("getMessage", (data) => {
             setArrivalMessage({
                 sender: data.senderId,
                 message: data.message,
                 createdAt: Date.now(),
             });
-        });
-    }, []);
+        })
+    }, [socket]);
     useEffect(() => {
         setMessages(convos?.find(item => item.id === currentChat?.id)?.Messages)
     }, [currentChat, convos]);
@@ -52,11 +51,8 @@ export default function Messenger() {
     }, [arrivalMessage, currentChat]);
 
     useEffect(() => {
-        socket.current.emit("addUser", user.id);
-        // socket.current.on("getUsers", (users) => {
-        //     console.log(users)
-        // });
-    }, [user]);
+        socket?.emit("addUser", user.id);
+    }, [user, socket]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -70,10 +66,15 @@ export default function Messenger() {
             (member) => member !== user.id
         );
 
-        socket.current.emit("sendMessage", {
+        socket?.emit("sendMessage", {
             senderId: user.id,
             receiverId,
             message: message,
+        });
+        socket?.emit("sendNotification", {
+            senderName: user.username,
+            receiverId,
+            type: "message",
         });
 
         addMessage(message, dispatch)
@@ -130,14 +131,7 @@ export default function Messenger() {
                     </div>
                 </div>
                 <div className="chatOnline">
-                    {/* <div className="chatOnlineWrapper">
-                        <ChatOnline
-                            onlineUsers={onlineUsers}
-                            currentId={user._id}
-                            setCurrentChat={setCurrentChat}
-                        />
-                    </div> */}
-                    <Rightbar />
+                    <Rightbar socket={socket} />
                 </div>
             </div>
         </>

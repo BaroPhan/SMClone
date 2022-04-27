@@ -69,23 +69,6 @@ export default function Post({ post }) {
         close_option()
     }
 
-
-    useEffect(() => {
-        // socket.on('connect', function () {
-        //     console.log(socket.socket.sessionid)
-
-        // });
-        // socket.current = io("ws://localhost:8900");
-        // socket.current.on("getMessage", (data) => {
-        //     setArrivalMessage({
-        //         sender: data.senderId,
-        //         message: data.message,
-        //         createdAt: Date.now(),
-        //     });
-        // });
-    }, []);
-
-
     return (
         <div className="post">
             <div className="postWrapper">
@@ -227,7 +210,7 @@ export default function Post({ post }) {
                             <hr className="postHr" />
                             <div className="postComment">
                                 <Link to={`/profile/${currentUser.username}`} style={{ textDecoration: 'none' }}>
-                                    <img src={currentUser.profile_picture ? PF + currentUser.profile_picture : PF + "person/noAvatar.png"} alt="" className="postProfileImg" />
+                                    <img src={currentUser.profile_picture ? currentUser.profile_picture : PF + "person/noAvatar.png"} alt="" className="postProfileImg" />
                                 </Link>
                                 <div className="commentInputBar">
                                     <input id="input" placeholder="Write a comment..." className="commentInput" ref={commentRef} />

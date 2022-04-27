@@ -22,7 +22,17 @@
     border-radius: 50%;
     background-color: limegreen;
     position: absolute;
-    top: -2px;
+    bottom: -2px;
+    right: 0;
+    border: 2px solid white;
+}
+.rightbarOffline {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: rgb(161, 159, 159);
+    position: absolute;
+    bottom: -2px;
     right: 0;
     border: 2px solid white;
 }

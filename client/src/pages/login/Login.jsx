@@ -12,12 +12,7 @@ export default function Login() {
     const password = useRef()
     const { isFetching, error } = useSelector(state => state.user)
     const dispatch = useDispatch()
-    // const socket = io("ws://localhost:8900");
-    // useEffect(() => {
-    //     socket.on("getUsers", (users) => {
-    //         console.log(users);
-    //     });
-    // })
+
     const handleClick = (e) => {
         e.preventDefault()
         login({ email: email.current.value, password: password.current.value }, dispatch);

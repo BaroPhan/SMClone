@@ -25,7 +25,8 @@ router.put('/:id', verifyTokenAndAuthorization, async (req, res) => {
                 id: req.params.id
             }
         });
-        res.status(200).json("Account updated")
+        const result = await models.User.findOne({ where: { id: req.params.id } })
+        res.status(200).json(result)
     } catch (error) {
         console.log(error)
         return res.status(500).json(error)
@@ -65,6 +66,27 @@ router.get('/', async (req, res) => {
         return res.status(500).json(err)
     }
 })
+//GET USERS
+router.get('/all', async (req, res) => {
+    try {
+        const users = await models.User.findAll({
+            include: [
+                {
+                    association: "follow_user_id_Users",
+                    attributes: ['username', 'profile_picture'],
+                },
+                {
+                    association: "user_id_User_Follows",
+                    attributes: ['username', 'profile_picture'],
+                },
+            ],
+        })
+        res.status(200).json(users)
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json(err)
+    }
+})
 //GET FRIENDS/FOLLOWERS
 router.get('/friends/:userId', async (req, res) => {
     try {
@@ -94,25 +116,39 @@ router.get('/friends/:userId', async (req, res) => {
 })
 //FOLLOW USER
 router.post('/:id/follow', verifyTokenAndAuthorization, async (req, res) => {
-    if (req.body.user_id !== req.params.id) {
+    if (req.body.id !== req.params.id) {
         try {
             const is_followed = await models.Follow.findOne({
                 where:
                 {
-                    user_id: req.body.user_id,
+                    user_id: req.body.id,
                     follow_user_id: req.params.id
                 }
             })
             if (is_followed) {
                 await is_followed.destroy({ truncate: true })
-                res.status(200).json("User has been unfollowed")
+                console.log("Unfollowed")
             } else {
                 const new_follow = await models.Follow.create({
-                    user_id: req.body.user_id,
+                    user_id: req.body.id,
                     follow_user_id: req.params.id
                 })
-                res.status(200).json("User has been followed")
+                console.log("Followed")
             }
+            const user = await models.User.findOne({
+                where: { id: req.params.id },
+                include: [
+                    {
+                        association: "follow_user_id_Users",
+                        attributes: ['username', 'profile_picture'],
+                    },
+                    {
+                        association: "user_id_User_Follows",
+                        attributes: ['username', 'profile_picture'],
+                    },
+                ],
+            })
+            res.status(200).json(user)
         } catch (error) {
             console.log(error)
             res.status(500).json(error)

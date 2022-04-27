@@ -16,11 +16,13 @@ const verifyToken = (req, res, next) => {
 
 const verifyTokenAndAuthorization = (req, res, next) => {
     verifyToken(req, res, () => {
-        console.log(req.user, req.body)
-        if (req.user.id === req.params.id || req.user.id === req.body.user_id || req.user.id === req.body.sender_id || req.user.is_admin) {
+        if (req.user.id === req.params.id || req.user.id === req.body.user_id || req.user.id === req.body.sender_id || req.user.id === req.body.id || req.user.is_admin) {
             console.log("authenticated")
             next()
-        } else res.status(403).json('You arent allowed to do that')
+        } else {
+            console.log("USER: ", req.user, "BODY: ", req.body)
+            res.status(403).json('You arent allowed to do that')
+        }
     })
 }
 

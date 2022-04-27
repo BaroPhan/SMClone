@@ -6,18 +6,20 @@ import Rightbar from "../../components/rightbar/Rightbar";
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router'
 import axios from 'axios';
+import { useSelector } from 'react-redux';
 
 export default function Profile() {
     const PF = process.env.REACT_APP_PUBLIC_FOLDER
     const username = useParams().username
-    const [user, setUser] = useState({})
-    useEffect(() => {
-        const fetchUser = async () => {
-            const user = await axios.get(`/user?username=${username}`)
-            setUser(user.data)
-        }
-        fetchUser()
-    }, [username])
+    const user = useSelector(state => state.user.users).find(item => item.username === username)
+    // const [user, setUser] = useState({})
+    // useEffect(() => {
+    //     const fetchUser = async () => {
+    //         const user = await axios.get(`/user?username=${username}`)
+    //         setUser(user.data)
+    //     }
+    //     fetchUser()
+    // }, [username])
 
     return (
         <>
@@ -29,12 +31,12 @@ export default function Profile() {
                         <div className="profileCover">
                             <img
                                 className="profileCoverImg"
-                                src={user.coverPicture ? PF + user.profile_picture : PF + "person/noCover.png"}
+                                src={user.cover_picture ? user.profile_picture : PF + "person/noCover.png"}
                                 alt=""
                             />
                             <img
                                 className="profileUserImg"
-                                src={user.profile_picture ? PF + user.profile_picture : PF + "person/noAvatar.png"}
+                                src={user.profile_picture ? user.profile_picture : PF + "person/noAvatar.png"}
                                 alt=""
                             />
                         </div>

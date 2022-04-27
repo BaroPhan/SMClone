@@ -42,8 +42,8 @@ export default function Register() {
                     <form className="loginBox" onSubmit={handleClick}>
                         <input placeholder="Username" required ref={username} className="loginInput" />
                         <input placeholder="Email" required ref={email} type="email" className="loginInput" />
-                        <input placeholder="Password" required ref={password} type="password" minLength="6" className="loginInput" />
-                        <input placeholder="Re-enter password" required ref={passwordAgain} type="password" minLength="6" className="loginInput" />
+                        <input placeholder="Password" required ref={password} type="password" minLength="4" className="loginInput" />
+                        <input placeholder="Re-enter password" required ref={passwordAgain} type="password" minLength="4" className="loginInput" />
                         <button className="loginButton" type="submit">Sign Up</button>
                         <button className="loginRegisterButton">Log into your account</button>
                     </form>

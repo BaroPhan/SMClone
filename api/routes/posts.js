@@ -165,6 +165,10 @@ router.get('/profile/:username', async (req, res) => {
                                 },
                             ],
                         },
+                        {
+                            association: "user",
+                            attributes: ['username', 'profile_picture']
+                        },
                     ],
                 },
             ],

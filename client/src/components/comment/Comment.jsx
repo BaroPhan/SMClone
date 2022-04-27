@@ -43,7 +43,7 @@ export const Comment = ({ comment }) => {
     return (
         <div className="container">
             <Link to={`/profile/${comment.user?.username}`} style={{ textDecoration: 'none' }}>
-                <img src={comment.user?.profile_picture ? PF + comment.user?.profile_picture : PF + "person/noAvatar.png"} alt="" className="commentProfileImg" />
+                <img src={comment.user?.profile_picture ? comment.user?.profile_picture : PF + "person/noAvatar.png"} alt="" className="commentProfileImg" />
             </Link>
             <div className="commentContainer">
                 <div className="comment">
@@ -72,7 +72,7 @@ export const Comment = ({ comment }) => {
                     <form onSubmit={replyHandler}>
                         <div className="reply">
                             <Link to={`/profile/${currentUser.username}`} style={{ textDecoration: 'none' }}>
-                                <img src={currentUser.profile_picture ? PF + currentUser.profile_picture : PF + "person/noAvatar.png"} alt="" className="replyProfileImg" />
+                                <img src={currentUser.profile_picture ? currentUser.profile_picture : PF + "person/noAvatar.png"} alt="" className="replyProfileImg" />
                             </Link>
                             <div className="replyInputBar">
                                 <input id='replyInput' placeholder="Write a reply..." className="replyInput" ref={replyRef} />

@@ -1,6 +1,6 @@
 import { publicRequest, userRequest } from "../requestMethods"
 import { addPostFailure, addPostStart, addPostSuccess, getPostsFailure, getPostsStart, getPostsSuccess, likePostStart, likePostSuccess, likePostFailure, updatePostStart, updatePostSuccess, updatePostFailure, deletePostStart, deletePostSuccess, deletePostFailure } from "./postRedux";
-import { loginFailure, loginStart, loginSuccess, resetState, updateUserFailure, updateUserStart } from "./userRedux";
+import { getUsersFailure, getUsersStart, getUsersSuccess, loginFailure, loginStart, loginSuccess, resetState, updateUserFailure, updateUsersFailure, updateUsersStart, updateUsersSuccess, updateUserStart, updateUserSuccess } from "./userRedux";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import app from '../firebase'
 import { addCommentFailure, addCommentStart, addCommentSuccess, getCommentsFailure, getCommentsStart, getCommentsSuccess, likeCommentFailure, likeCommentStart, likeCommentSuccess, updateCommentFailure, updateCommentStart, updateCommentSuccess } from "./commentRedux";
@@ -18,7 +18,6 @@ export const login = async (userCredientals, dispatch) => {
         userRequest.defaults.headers.token = `Bearer ${TOKEN}`
 
         res.data.profile_picture = res.data.profile_picture ? res.data.profile_picture : 'person/noAvatar.png'
-        console.log(res.data)
         dispatch(loginSuccess(res.data));
     } catch (error) {
         console.log(error)
@@ -31,6 +30,40 @@ export const logout = async (dispatch) => {
     socket.disconnect()
     dispatch(resetState())
 };
+//UPDATE USER
+export const updateUser = async (user, dispatch) => {
+    dispatch(updateUserStart());
+    try {
+        await userRequest.put(`/user/${user.id}`, user);
+        dispatch(updateUserSuccess(user));
+    } catch (err) {
+        dispatch(updateUserFailure());
+    }
+}
+//GET USERS
+export const getUsers = async (dispatch) => {
+    dispatch(getUsersStart());
+    try {
+        const res = await publicRequest.get("/user/all/")
+        dispatch(getUsersSuccess(res.data));
+    } catch (err) {
+        dispatch(getUsersFailure());
+    }
+}
+//FOLLOW USERS
+export const followUser = async (currentUser, followUser, dispatch) => {
+    dispatch(updateUsersStart());
+    try {
+        const res = await publicRequest.post(`/user/${followUser.id}/follow`, currentUser, {
+            headers: {
+                token: 'Bearer ' + currentUser.accessToken
+            }
+        })
+        dispatch(updateUsersSuccess(res.data));
+    } catch (err) {
+        dispatch(updateUsersFailure());
+    }
+}
 
 //POST
 //CREATE POST

@@ -27,7 +27,17 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const user = await models.User.findOne({
-            where: { email: req.body.email }
+            where: { email: req.body.email },
+            include: [
+                {
+                    association: "follow_user_id_Users",
+                    attributes: ['username', 'profile_picture'],
+                },
+                {
+                    association: "user_id_User_Follows",
+                    attributes: ['username', 'profile_picture'],
+                },
+            ],
         })
         !user && res.status(404).json("user not found")
 

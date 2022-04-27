@@ -1,84 +1,94 @@
 import './rightbar.css'
 import Online from '../../components/online/Online'
-import { useEffect, useState } from 'react'
-import axios from 'axios'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { publicRequest, userRequest } from '../../requestMethods';
 import { Add, Edit, Remove } from '@mui/icons-material'
 import { useDispatch, useSelector } from 'react-redux'
 import Popup from 'reactjs-popup'
+import { followUser, updateUser, uploadImg } from '../../redux/apiCalls'
 
-export default function Rightbar({ user }) {
+export default function Rightbar({ user, socket }) {
     const PF = process.env.REACT_APP_PUBLIC_FOLDER
     const currentUser = useSelector(state => state.user.currentUser)
     const dispatch = useDispatch()
 
-    const [friends, setFriends] = useState([])
+    const [online, setOnline] = useState()
     const [profileImage, setProfileImage] = useState()
     const [coverImage, setCoverImage] = useState()
 
-    //bool state to check if user is followed or not
-    const [followed, setFollowed] = useState()
+    const relationship = useRef()
+    const username = useRef()
+    const email = useRef()
+    const password = useRef()
+    const desc = useRef()
+    const from = useRef()
 
     useEffect(() => {
-        const getFriends = async () => {
-            try {
-                const res = await publicRequest.get('/user/friends/' + currentUser?.id)
-                setFriends(res.data)
-            } catch (error) {
-                console.log(error);
-            }
-        }
-        getFriends()
-    }, [currentUser, user])
-    useEffect(() => {
-        const getFollowed = async () => {
-            try {
-                const res = await publicRequest.get('/user/friends/' + user?.id, { user_id: currentUser?.id })
-                console.log(res.data)
-                setFollowed(res.data)
-            } catch (error) {
-                console.log(error);
-            }
-        }
-        getFollowed()
-    }, [currentUser, user])
+        socket?.on("getUsers", (users) => {
+            setOnline(users.filter(item => item.userId !== currentUser.id))
 
-    //handle follow button in profile
-    const handleClick = async () => {
-        try {
-            if (followed) {
-                await axios.put(`/user/${user.id}/unfollow`, { userId: currentUser.id })
-                dispatch({ type: "UNFOLLOW", payload: user.id })
-            } else {
-                await axios.put(`/user/${user.id}/follow`, { userId: currentUser.id })
-                dispatch({ type: "FOLLOW", payload: user.id })
-            }
+        });
+    }, [socket, currentUser])
+
+
+    const handleClick = async (type) => {
+        if (!user.user_id_User_Follows?.some(item => item.username === currentUser.username)) {
+            socket?.emit("sendNotification", {
+                senderName: currentUser.username,
+                receiverId: user.id,
+                type: "follow",
+            });
         }
-        catch (error) {
-            console.log(error);
-        }
+        followUser(currentUser, user, dispatch)
     }
 
     //edit profile
     const updateProfile = async (e, close) => {
         e.preventDefault()
+        console.log(username.current.value);
+        var updatedUser = {
+            ...currentUser,
+            id: currentUser.id,
+            desc: desc.current.value,
+            username: username.current.value,
+            email: email.current.value,
+            password: password.current.value,
+            from: from.current.value,
+            relationship: relationship.current.value,
+        }
+        if (profileImage) {
+            uploadImg(profileImage).then((res, err) => {
+                updatedUser = { ...updatedUser, profile_picture: res }
+                updateUser(updatedUser, dispatch)
+            })
+        } else {
+            console.log(updatedUser)
+            updateUser(updatedUser, dispatch)
+        }
+        close()
     }
 
     const HomeRightBar = () => {
         return (
             <>
-                <div className="birthdayContainer">
+                {/* <div className="birthdayContainer">
                     <img src={`${PF}gift.png`} alt="" className="birthdayImg" />
                     <span className="birthdayText">
                         <b>Person 1</b> and <b>3 other friends</b> have a birthday today
                     </span>
-                </div>
-
-                <img alt="" className="rightbarAd" />
+                </div> */}
+                {/* <img alt="" className="rightbarAd" /> */}
                 <h4 className="rightbarTitle">Online Friends</h4>
                 <ul className="rightbarFriendList">
-                    {friends.map(u => (
+                    {online?.map(u => (
+                        <Online key={u.id} user={u} online="online" />
+                    ))}
+                </ul>
+                <h4 className="rightbarTitle">Offline Friends</h4>
+                <ul className="rightbarFriendList">
+                    {currentUser.follow_user_id_Users.filter(item => {
+                        return online?.some((c) => (item.Follow.follow_user_id !== c.userId))
+                    })?.map(u => (
                         <Online key={u.id} user={u} />
                     ))}
                 </ul>
@@ -91,8 +101,8 @@ export default function Rightbar({ user }) {
                 {user.username !== currentUser.username
                     ? (
                         <button className="rightbarFollowButton" onClick={handleClick}>
-                            {followed ? "Unfollow" : "Follow"}
-                            {followed ? <Remove /> : <Add />}
+                            {user.user_id_User_Follows?.some(item => item.username === currentUser.username) ? "Unfollow" : "Follow"}
+                            {user.user_id_User_Follows?.some(item => item.username === currentUser.username) ? <Remove /> : <Add />}
                         </button>
                     )
                     : (
@@ -105,7 +115,7 @@ export default function Rightbar({ user }) {
                             modal
                         >
                             {close => (
-                                <form onSubmit={e => updateProfile(e, close)} className="modalProfile">
+                                <form onSubmit={e => updateProfile(e, close)} className="profile_modal">
                                     <button className="close" onClick={close}>
                                         &times;
                                     </button>
@@ -118,11 +128,11 @@ export default function Rightbar({ user }) {
                                                     <div className="title">Profile picture</div>
                                                     <label className="editProfileImg">
                                                         <span className='editProfileImgText'>Edit</span>
-                                                        <input id="file" name="file" type="file" accept=".png, .jpeg, .jpg" onChange={(e) => setProfileImage(e.target.files[0])} style={{ display: "none" }} />
+                                                        <input id="profileFile" name="profileFile" type="file" accept=".png, .jpeg, .jpg" onChange={e => setProfileImage(e.target.files[0])} style={{ display: "none" }} />
                                                     </label>
                                                 </div>
                                                 <div className="imageContainer">
-                                                    <img src={profileImage ? URL.createObjectURL(profileImage) : user?.profile_picture ? PF + user?.profile_picture : PF + "person/noAvatar.png"} alt="" className="profileImg" />
+                                                    <img src={profileImage ? URL.createObjectURL(profileImage) : currentUser.profile_picture ? currentUser.profile_picture : PF + "person/noAvatar.png"} alt="" className="profileImg" />
                                                 </div>
                                             </div>
                                             <div className="editCard">
@@ -130,11 +140,11 @@ export default function Rightbar({ user }) {
                                                     <div className="title">Cover picture</div>
                                                     <label className="editProfileImg">
                                                         <span className='editProfileImgText'>Edit</span>
-                                                        <input id="file" name="file" type="file" accept=".png, .jpeg, .jpg" onChange={(e) => setCoverImage(e.target.files[0])} style={{ display: "none" }} />
+                                                        <input id="coverFile" name="coverFile" type="file" accept=".png, .jpeg, .jpg" onChange={e => setCoverImage(e.target.files[0])} style={{ display: "none" }} />
                                                     </label>
                                                 </div>
                                                 <div className="imageContainer">
-                                                    <img src={coverImage ? URL.createObjectURL(coverImage) : user?.cover_picture ? PF + user?.cover_picture : PF + "person/noCover.png"} alt="" className="coverImg" />
+                                                    <img src={coverImage ? URL.createObjectURL(coverImage) : currentUser.cover_picture ? currentUser.cover_picture : PF + "person/noCover.png"} alt="" className="coverImg" />
                                                 </div>
                                             </div>
                                             <div className="editCard">
@@ -144,40 +154,66 @@ export default function Rightbar({ user }) {
                                                 <input
                                                     className="editProfileInput"
                                                     type="text"
-                                                    defaultValue={user?.username}
+                                                    defaultValue={currentUser.username}
+                                                    ref={username}
                                                 />
                                             </div>
                                             <div className="editCard">
                                                 <div className="titleContainer">
-                                                    <div className="title">Username</div>
+                                                    <div className="title">Email</div>
                                                 </div>
                                                 <input
                                                     className="editProfileInput"
-                                                    type="text"
-                                                    defaultValue={user?.username}
+                                                    type="email"
+                                                    required
+                                                    defaultValue={currentUser.email}
+                                                    ref={email}
                                                 />
                                             </div>
                                             <div className="editCard">
                                                 <div className="titleContainer">
-                                                    <div className="title">Username</div>
+                                                    <div className="title">Password</div>
                                                 </div>
                                                 <input
                                                     className="editProfileInput"
-                                                    type="text"
-                                                    defaultValue={user?.username}
+                                                    type="password"
+                                                    required minLength="4"
+                                                    defaultValue={currentUser.password}
+                                                    ref={password}
                                                 />
                                             </div>
                                             <div className="editCard">
                                                 <div className="titleContainer">
-                                                    <div className="title">Username</div>
+                                                    <div className="title">Description</div>
                                                 </div>
                                                 <input
                                                     className="editProfileInput"
                                                     type="text"
-                                                    defaultValue={user?.username}
+                                                    defaultValue={currentUser.desc}
+                                                    ref={desc}
                                                 />
                                             </div>
-
+                                            <div className="editCard">
+                                                <div className="titleContainer">
+                                                    <div className="title">From</div>
+                                                </div>
+                                                <input
+                                                    className="editProfileInput"
+                                                    type="text"
+                                                    defaultValue={currentUser.from}
+                                                    ref={from}
+                                                />
+                                            </div>
+                                            <div className="editCard">
+                                                <div className="titleContainer">
+                                                    <div className="title">Relationship</div>
+                                                </div>
+                                                <select className='relationshipSelect' name="color" ref={relationship} >
+                                                    <option>Single</option>
+                                                    <option>In a relationship</option>
+                                                    <option>Complicated</option>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="actions">
@@ -192,24 +228,24 @@ export default function Rightbar({ user }) {
                 <div className="rightbarInfo">
                     <div className="rightbarInfoItem">
                         <span className="rightbarInfoKey">Email:</span>
-                        <span className="rightbarInfoValue">{user.email}</span>
+                        <span className="rightbarInfoValue">{currentUser.email}</span>
                     </div>
                     <div className="rightbarInfoItem">
                         <span className="rightbarInfoKey">From:</span>
-                        <span className="rightbarInfoValue">{user.from}</span>
+                        <span className="rightbarInfoValue">{currentUser.from}</span>
                     </div>
                     <div className="rightbarInfoItem">
                         <span className="rightbarInfoKey">Relationship:</span>
-                        <span className="rightbarInfoValue">{user.relationship}</span>
+                        <span className="rightbarInfoValue">{currentUser.relationship}</span>
                     </div>
                 </div>
-                <h4 className="rightbarTitle">User friends</h4>
+                <h4 className="rightbarTitle">User follows</h4>
                 <div className="rightbarFollowings">
-                    {friends.map(u => (
+                    {user.follow_user_id_Users?.map(u => (
                         <Link key={u.id} to={"/profile/" + u.username} style={{ textDecoration: "none", color: "black" }}>
                             <div className="rightbarFollowing">
                                 <img
-                                    src={u.profile_picture ? PF + u.profile_picture : PF + "person/noAvatar.png"}
+                                    src={u.profile_picture ? u.profile_picture : PF + "person/noAvatar.png"}
                                     alt=""
                                     className="rightbarFollowingImg"
                                 />

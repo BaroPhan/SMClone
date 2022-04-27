@@ -33,6 +33,12 @@
     align-items: center;
     margin-bottom: 20px;
 }
+.sidebarListItemDisabled {
+    display: flex;
+    color: grey;
+    align-items: center;
+    margin-bottom: 20px;
+}
 
 .sidebarIcon {
     margin-right: 15px;

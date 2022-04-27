@@ -33,7 +33,7 @@ export default function Share({ username }) {
             <div className="shareWrapper">
                 <form onSubmit={submitHandler}>
                     <div className="shareTop">
-                        <img className="shareProfileImg" src={PF + user.profile_picture} alt="" />
+                        <img className="shareProfileImg" src={user.profile_picture ? user.profile_picture : PF + "person/noAvatar.png"} alt="" />
                         <input
                             placeholder={"What's in your mind " + user.username + "?"}
                             className="shareInput"

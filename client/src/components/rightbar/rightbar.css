@@ -180,7 +180,7 @@
     color: white;
 }
 
-.modalProfile {
+.profile_modal {
     font-size: 12px;
     width: 100%;
     border-radius: 10px;
@@ -189,7 +189,7 @@
     box-shadow: 0px 0px 16px -8px rgba(0, 0, 0, 0.68);
     background-color: white;
 }
-.modalProfile > .header {
+.profile_modal > .header {
     width: 100%;
     font-weight: 500;
     font-size: 18px;
@@ -198,16 +198,16 @@
     justify-content: center;
     align-items: center;
 }
-.modalProfile > .content {
+.profile_modal > .content {
     width: 100%;
 }
-.modalProfile > .actions {
+.profile_modal > .actions {
     width: 100%;
     padding: 10px 5px;
     margin: auto;
     text-align: center;
 }
-.modalProfile > .close {
+.profile_modal > .close {
     cursor: pointer;
     position: absolute;
     display: block;
@@ -219,4 +219,11 @@
     background: #ffffff;
     border-radius: 18px;
     border: 1px solid #cfcece;
+}
+
+.relationshipSelect {
+    margin-right: 20px;
+    padding: 5px;
+    border: none;
+    margin: 10px;
 }
