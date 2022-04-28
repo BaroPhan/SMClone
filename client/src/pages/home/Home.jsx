@@ -6,10 +6,12 @@ import './home.css'
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { io } from 'socket.io-client';
+import { useLocation } from 'react-router-dom';
 
 export default function Home() {
     const [socket, setSocket] = useState()
     const user = useSelector(state => state.user.currentUser)
+    const search = useLocation().state?.search
 
     useEffect(() => {
         setSocket(io("ws://localhost:8900"));
@@ -22,7 +24,7 @@ export default function Home() {
             <Topbar socket={socket} />
             <div className="homeContainer">
                 <Sidebar />
-                <Feed />
+                <Feed search={search} socket={socket} />
                 <Rightbar socket={socket} />
             </div>
         </>

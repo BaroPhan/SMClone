@@ -5,3 +5,14 @@
 .feedWrapper {
     padding: 20px;
 }
+
+.searchContainer {
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+}
+
+.search {
+    margin: 20px;
+    font-size: 30px;
+    font-weight: 500;
+}

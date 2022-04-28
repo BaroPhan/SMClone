@@ -3,7 +3,7 @@ import { Search, Person, Chat, Notifications } from '@mui/icons-material';
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/apiCalls";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Popup from "reactjs-popup";
 export default function Topbar({ socket }) {
     const PF = process.env.REACT_APP_PUBLIC_FOLDER
@@ -13,6 +13,7 @@ export default function Topbar({ socket }) {
     const [notifications, setNotifications] = useState([]);
     const [person, setPerson] = useState([]);
     const [message, setMessage] = useState([]);
+    const search = useRef()
 
 
     const handleLogout = (e) => {
@@ -66,6 +67,13 @@ export default function Topbar({ socket }) {
         setPerson([]);
     };
 
+    const handleSearch = (e) => {
+        e.preventDefault()
+        navigate('/', { state: { search: search.current.value } })
+        document.getElementById('search').value = ''
+        document.getElementById('search').blur()
+    }
+
     return (
         <div className="topbarContainer">
             <div className="topbarLeft">
@@ -74,10 +82,10 @@ export default function Topbar({ socket }) {
                 </Link>
             </div>
             <div className="topbarCenter">
-                <div className="searchbar">
+                <form className="searchbar" onSubmit={handleSearch}>
                     <Search className="searchIcon" />
-                    <input placeholder="Search friends, posts..." className="searchInput" />
-                </div>
+                    <input placeholder="Search friends, posts..." id='search' className="searchInput" ref={search} />
+                </form>
             </div>
             <div className="topbarRight">
                 <div className="topbarLinks">

@@ -26,12 +26,11 @@ export default function Rightbar({ user, socket }) {
     useEffect(() => {
         socket?.on("getUsers", (users) => {
             setOnline(users.filter(item => item.userId !== currentUser.id))
-
         });
     }, [socket, currentUser])
 
 
-    const handleClick = async (type) => {
+    const handleClick = async () => {
         if (!user.user_id_User_Follows?.some(item => item.username === currentUser.username)) {
             socket?.emit("sendNotification", {
                 senderName: currentUser.username,
@@ -80,17 +79,25 @@ export default function Rightbar({ user, socket }) {
                 {/* <img alt="" className="rightbarAd" /> */}
                 <h4 className="rightbarTitle">Online Friends</h4>
                 <ul className="rightbarFriendList">
-                    {online?.map(u => (
+                    {online && online?.map(u => (
                         <Online key={u.id} user={u} online="online" />
                     ))}
                 </ul>
                 <h4 className="rightbarTitle">Offline Friends</h4>
                 <ul className="rightbarFriendList">
-                    {currentUser.follow_user_id_Users.filter(item => {
-                        return online?.some((c) => (item.Follow.follow_user_id !== c.userId))
-                    })?.map(u => (
-                        <Online key={u.id} user={u} />
-                    ))}
+                    {online?.length > 0
+                        ? currentUser.follow_user_id_Users.filter(item => {
+                            return online?.some((c) => (item.Follow.follow_user_id !== c.userId))
+                        })?.map(u => (
+                            <Online key={u.id} user={u} />
+                        ))
+                        : currentUser.follow_user_id_Users.map(u => (
+                            <>
+                                {console.log(u)}
+                                <Online key={u.id} user={u} />
+                            </>
+                        ))
+                    }
                 </ul>
             </>
         )

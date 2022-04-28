@@ -5,7 +5,6 @@ export default function Online({ user, online }) {
     const PF = process.env.REACT_APP_PUBLIC_FOLDER
     const users = useSelector(state => state.user.users).find(item => online ? item.id === user.userId : item.username === user.username)
 
-
     return (
         <li className="rightbarFriend">
             <Link to={`/profile/${users?.username}`} style={{ textDecoration: 'none' }}>
